@@ -2,6 +2,7 @@ module Main where
 import System.Environment
 import System.IO
 import Control.Monad
+import qualified Parser
 
 main :: IO ()
 main = do
@@ -19,9 +20,15 @@ prompt s = do
 repl :: IO ()
 repl = do
   line <- prompt "toy> "
-  -- TODO: eval line
-  putStrLn line
-  unless (line == ":q") repl
+  when (line /= ":q")
+    (do
+       eval line
+       repl)
+
+eval :: String -> IO ()
+eval text = case Parser.parse text of
+              Just exp -> print exp
+              Nothing -> print "Unknown expression"
 
 interpret :: String -> IO ()
 interpret path = do
